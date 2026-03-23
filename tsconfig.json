@@ -16,5 +16,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "templates"]
+  "include": ["src", "templates/template-k", "templates/template-l"],
+  "exclude": ["node_modules", "templates/template-a", "templates/template-b", "templates/template-c"]
 }
