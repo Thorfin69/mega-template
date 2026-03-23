@@ -8,4 +8,13 @@ export default defineConfig({
       'motion/react': 'motion/react',
     },
   },
+  server: {
+    proxy: {
+      '/api/minimax': {
+        target: 'https://api.minimax.chat',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/minimax/, '/v1'),
+      },
+    },
+  },
 });
