@@ -4,220 +4,158 @@ import { motion } from 'motion/react';
 interface Step1Props {
   onComplete: (description: string) => void;
   isLoading: boolean;
+  error: string | null;
 }
 
 const SUGGESTIONS = [
-  'Travel nursing agency',
-  'B2B SaaS platform',
-  'Healthcare clinic',
-  'E-commerce brand',
-  'Real estate firm',
+  { label: 'Travel nursing agency', icon: '🏥' },
+  { label: 'B2B SaaS platform', icon: '⚡' },
+  { label: 'Healthcare clinic', icon: '💊' },
+  { label: 'E-commerce brand', icon: '🛍️' },
+  { label: 'Real estate firm', icon: '🏢' },
 ];
 
-const containerVariants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.09,
-    },
-  },
-};
+const stagger = { visible: { transition: { staggerChildren: 0.07 } } };
+const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as number[] } } };
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] },
-  },
-};
+export default function Step1Describe({ onComplete, isLoading, error }: Step1Props) {
+  const [text, setText] = useState('');
+  const [focused, setFocused] = useState(false);
 
-export default function Step1Describe({ onComplete, isLoading }: Step1Props) {
-  const [description, setDescription] = useState('');
-
-  const handleSubmit = () => {
-    if (!description.trim() || isLoading) return;
-    onComplete(description.trim());
-  };
-
-  const handleSuggestion = (suggestion: string) => {
-    setDescription(suggestion);
-  };
-
-  const isEmpty = description.trim().length === 0;
+  const empty = text.trim().length === 0;
 
   return (
-    <div
-      className="min-h-screen w-full flex items-center justify-center px-4 py-16"
-      style={{ backgroundColor: '#050507' }}
-    >
+    <div className="flex min-h-[calc(100vh-60px)] items-center justify-center px-4 py-20">
       <motion.div
-        className="w-full max-w-2xl flex flex-col items-center gap-8"
-        variants={containerVariants}
+        className="w-full max-w-2xl flex flex-col items-center"
+        variants={stagger}
         initial="hidden"
         animate="visible"
       >
         {/* Badge */}
-        <motion.div variants={itemVariants}>
+        <motion.div variants={fadeUp} className="mb-8">
           <span
-            className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium tracking-wide"
-            style={{
-              background:
-                'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(59,130,246,0.15) 100%)',
-              borderColor: 'rgba(139,92,246,0.35)',
-              color: '#a78bfa',
-            }}
+            className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-medium tracking-wide"
+            style={{ background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(124,58,237,0.3)', color: '#c4b5fd' }}
           >
-            <span
-              className="inline-block h-1.5 w-1.5 rounded-full"
-              style={{ backgroundColor: '#a78bfa' }}
-            />
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: '#a78bfa', animationDuration: '2s' }} />
+              <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: '#a78bfa' }} />
+            </span>
             AI-Powered Page Builder
           </span>
         </motion.div>
 
         {/* Heading */}
-        <motion.div variants={itemVariants} className="text-center">
-          <h1 className="text-5xl font-bold leading-tight tracking-tight text-white sm:text-6xl">
-            What are you
-            <br />
-            <span className="bg-gradient-to-r from-violet-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
-              building today?
-            </span>
-          </h1>
-        </motion.div>
+        <motion.h1
+          variants={fadeUp}
+          className="mb-5 text-center font-bold leading-[1.08] tracking-[-0.04em]"
+          style={{ fontSize: 'clamp(2.8rem, 7vw, 4.5rem)' }}
+        >
+          <span className="text-white">What do you want</span>
+          <br />
+          <span style={{ background: 'linear-gradient(135deg, #c4b5fd 0%, #818cf8 45%, #67e8f9 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+            to build?
+          </span>
+        </motion.h1>
 
         {/* Subtext */}
         <motion.p
-          variants={itemVariants}
-          className="text-center text-base text-slate-400 max-w-md leading-relaxed"
+          variants={fadeUp}
+          className="mb-10 text-center text-base leading-relaxed"
+          style={{ color: '#6b7280', maxWidth: '420px' }}
         >
-          Describe your business, audience, and goals. Our AI will architect the perfect page.
+          Describe your business and goals. Our AI will architect the perfect landing page.
         </motion.p>
 
         {/* Textarea */}
-        <motion.div variants={itemVariants} className="w-full">
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={6}
-            placeholder="e.g. A travel nursing agency that connects hospitals with qualified travel nurses. We're looking to attract nurses seeking high-paying contracts with great benefits..."
-            className="w-full rounded-2xl px-5 py-4 text-sm text-white placeholder-slate-500 resize-none transition-all duration-300 focus:outline-none"
+        <motion.div variants={fadeUp} className="w-full mb-5">
+          <div
+            className="relative rounded-2xl transition-all duration-200"
             style={{
-              backgroundColor: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              backdropFilter: 'blur(24px)',
-              boxShadow: description.trim().length > 0
-                ? '0 0 0 1.5px rgba(139,92,246,0.5), 0 0 40px rgba(139,92,246,0.12)'
-                : undefined,
+              background: focused ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.025)',
+              border: focused ? '1px solid rgba(124,58,237,0.55)' : '1px solid rgba(255,255,255,0.08)',
+              boxShadow: focused ? '0 0 0 4px rgba(124,58,237,0.1), 0 20px 60px rgba(0,0,0,0.3)' : '0 4px 24px rgba(0,0,0,0.2)',
             }}
-            onFocus={(e) => {
-              e.currentTarget.style.border = '1px solid rgba(139,92,246,0.6)';
-              e.currentTarget.style.boxShadow =
-                '0 0 0 1.5px rgba(139,92,246,0.3), 0 0 40px rgba(139,92,246,0.12)';
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.border = '1px solid rgba(255,255,255,0.08)';
-              e.currentTarget.style.boxShadow =
-                description.trim().length > 0
-                  ? '0 0 0 1.5px rgba(139,92,246,0.4), 0 0 30px rgba(139,92,246,0.1)'
-                  : 'none';
-            }}
-          />
+          >
+            <textarea
+              value={text}
+              onChange={e => setText(e.target.value)}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              rows={5}
+              placeholder="e.g. A travel nursing agency that connects hospitals with qualified travel nurses, targeting nurses seeking high-paying contracts with full housing and benefits..."
+              className="w-full resize-none bg-transparent px-6 py-5 text-[15px] leading-relaxed text-white placeholder-[#374151] focus:outline-none"
+            />
+            <div className="flex items-center justify-between px-6 pb-4">
+              <span className="text-xs" style={{ color: '#374151' }}>
+                {text.length > 0 ? `${text.length} characters` : 'Be as detailed as you want'}
+              </span>
+              <button
+                type="button"
+                onClick={() => { if (!empty && !isLoading) onComplete(text.trim()); }}
+                disabled={empty || isLoading}
+                className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40"
+                style={{
+                  background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)',
+                  boxShadow: !empty && !isLoading ? '0 0 20px rgba(124,58,237,0.4), 0 1px 2px rgba(0,0,0,0.2)' : 'none',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                }}
+              >
+                {isLoading ? (
+                  <>
+                    <svg className="h-3.5 w-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)" strokeWidth="3" />
+                      <path d="M12 2a10 10 0 0110 10" stroke="white" strokeWidth="3" strokeLinecap="round" />
+                    </svg>
+                    Thinking...
+                  </>
+                ) : (
+                  <>
+                    Continue
+                    <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none">
+                      <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </motion.div>
 
-        {/* Suggestion Pills */}
-        <motion.div
-          variants={itemVariants}
-          className="flex flex-wrap justify-center gap-2"
-        >
-          {SUGGESTIONS.map((s) => (
+        {/* Suggestions */}
+        <motion.div variants={fadeUp} className="flex flex-wrap justify-center gap-2">
+          <span className="text-xs mr-1 self-center" style={{ color: '#374151' }}>Try:</span>
+          {SUGGESTIONS.map(s => (
             <button
-              key={s}
+              key={s.label}
               type="button"
-              onClick={() => handleSuggestion(s)}
-              className="rounded-full px-4 py-1.5 text-sm text-slate-300 transition-all cursor-pointer"
-              style={{
-                backgroundColor: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.1)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(139,92,246,0.5)';
+              onClick={() => setText(s.label)}
+              className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs transition-all duration-150"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#9ca3af' }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = 'rgba(124,58,237,0.1)';
+                e.currentTarget.style.borderColor = 'rgba(124,58,237,0.35)';
                 e.currentTarget.style.color = '#c4b5fd';
               }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                e.currentTarget.style.color = '#cbd5e1';
+              onMouseLeave={e => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+                e.currentTarget.style.color = '#9ca3af';
               }}
             >
-              {s}
+              <span>{s.icon}</span>
+              {s.label}
             </button>
           ))}
         </motion.div>
 
-        {/* CTA Button */}
-        <motion.div variants={itemVariants} className="w-full flex justify-center">
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={isEmpty || isLoading}
-            className="relative inline-flex items-center gap-2.5 rounded-xl px-8 py-3.5 text-sm font-semibold text-white transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50"
-            style={{
-              background: isEmpty || isLoading
-                ? 'linear-gradient(135deg, rgba(109,40,217,0.5) 0%, rgba(67,56,202,0.5) 100%)'
-                : 'linear-gradient(135deg, #7c3aed 0%, #4338ca 100%)',
-              boxShadow:
-                !isEmpty && !isLoading
-                  ? '0 0 30px rgba(139,92,246,0.4)'
-                  : undefined,
-            }}
-            onMouseEnter={(e) => {
-              if (!isEmpty && !isLoading) {
-                e.currentTarget.style.boxShadow =
-                  '0 0 45px rgba(139,92,246,0.6)';
-                e.currentTarget.style.transform = 'translateY(-1px)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isEmpty && !isLoading) {
-                e.currentTarget.style.boxShadow =
-                  '0 0 30px rgba(139,92,246,0.4)';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }
-            }}
-          >
-            {isLoading ? (
-              <>
-                <svg
-                  className="h-4 w-4 animate-spin"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                  />
-                </svg>
-                Refining with AI...
-              </>
-            ) : (
-              <>
-                Refine with AI
-                <span className="text-violet-200">→</span>
-              </>
-            )}
-          </button>
-        </motion.div>
+        {/* Error */}
+        {error && (
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-5 text-sm text-red-400 text-center">
+            {error}
+          </motion.p>
+        )}
       </motion.div>
     </div>
   );

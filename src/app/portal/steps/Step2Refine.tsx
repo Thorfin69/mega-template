@@ -8,260 +8,171 @@ interface Step2Props {
   onNext: () => void;
 }
 
-const TONE_OPTIONS = [
-  { value: 'professional', label: 'Professional' },
-  { value: 'friendly', label: 'Friendly' },
-  { value: 'bold', label: 'Bold' },
-  { value: 'technical', label: 'Technical' },
-  { value: 'warm', label: 'Warm' },
-];
+const TONES = ['professional', 'friendly', 'bold', 'technical', 'warm'];
 
-const containerVariants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.07,
-    },
-  },
+const stagger = { visible: { transition: { staggerChildren: 0.06 } } };
+const fadeUp = { hidden: { opacity: 0, y: 18 }, visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.25, 0.1, 0.25, 1] as number[] } } };
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  background: 'rgba(255,255,255,0.04)',
+  border: '1px solid rgba(255,255,255,0.08)',
+  borderRadius: '10px',
+  padding: '10px 14px',
+  fontSize: '13px',
+  color: '#f1f5f9',
+  outline: 'none',
+  transition: 'all 0.15s',
 };
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] },
-  },
-};
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div
+      className="flex flex-col gap-2.5 rounded-2xl p-4"
+      style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)' }}
+    >
+      <label className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: '#6b7280' }}>
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+}
 
-const inputClass =
-  'bg-white/[0.06] border border-white/[0.1] rounded-xl text-white placeholder-slate-500 focus:border-violet-500/60 focus:outline-none w-full px-3 py-2 text-sm transition-colors duration-200';
-
-const cardClass =
-  'bg-white/[0.04] border border-white/[0.08] rounded-2xl p-4 flex flex-col gap-2 backdrop-blur-xl';
-
-const labelClass = 'text-xs font-medium text-slate-400 uppercase tracking-wider';
+function StyledInput({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+  return (
+    <input
+      type="text"
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      placeholder={placeholder}
+      style={inputStyle}
+      onFocus={e => { e.currentTarget.style.borderColor = 'rgba(124,58,237,0.5)'; e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
+      onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
+    />
+  );
+}
 
 export default function Step2Refine({ brief, onBriefChange, onBack, onNext }: Step2Props) {
-  const set = <K extends keyof RefinedBrief>(key: K, value: RefinedBrief[K]) => {
+  const set = <K extends keyof RefinedBrief>(key: K, value: RefinedBrief[K]) =>
     onBriefChange({ ...brief, [key]: value });
-  };
 
-  const setKeyPoint = (index: number, value: string) => {
+  const setKp = (i: number, v: string) => {
     const next = [...brief.keyPoints];
-    next[index] = value;
+    next[i] = v;
     onBriefChange({ ...brief, keyPoints: next });
   };
 
-  // Ensure keyPoints always has at least 3 slots
-  const kp = [
-    brief.keyPoints[0] ?? '',
-    brief.keyPoints[1] ?? '',
-    brief.keyPoints[2] ?? '',
-  ];
+  const kp = [brief.keyPoints[0] ?? '', brief.keyPoints[1] ?? '', brief.keyPoints[2] ?? ''];
 
   return (
-    <div
-      className="min-h-screen w-full flex items-center justify-center px-4 py-16"
-      style={{ backgroundColor: '#050507' }}
-    >
-      <motion.div
-        className="w-full max-w-3xl flex flex-col items-center gap-8"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {/* Badge */}
-        <motion.div variants={itemVariants}>
-          <span
-            className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium tracking-wide"
-            style={{
-              background:
-                'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(59,130,246,0.15) 100%)',
-              borderColor: 'rgba(139,92,246,0.35)',
-              color: '#a78bfa',
-            }}
-          >
-            <span
-              className="inline-block h-1.5 w-1.5 rounded-full"
-              style={{ backgroundColor: '#a78bfa' }}
-            />
-            Step 2 of 4 — Your Brief
-          </span>
-        </motion.div>
+    <div className="flex min-h-[calc(100vh-60px)] items-start justify-center px-4 py-16">
+      <motion.div className="w-full max-w-3xl flex flex-col gap-10" variants={stagger} initial="hidden" animate="visible">
 
-        {/* Heading */}
-        <motion.div variants={itemVariants} className="text-center">
-          <h1 className="text-5xl font-bold leading-tight tracking-tight text-white sm:text-6xl">
-            {"Here's your"}
-            <br />
-            <span className="bg-gradient-to-r from-violet-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
-              refined brief
+        {/* Header */}
+        <motion.div variants={fadeUp} className="text-center flex flex-col items-center gap-4">
+          <span className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-medium tracking-wide" style={{ background: 'rgba(124,58,237,0.1)', border: '1px solid rgba(124,58,237,0.25)', color: '#c4b5fd' }}>
+            Step 2 of 4 — Review your brief
+          </span>
+          <h1 className="font-bold tracking-[-0.04em] text-white" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', lineHeight: 1.1 }}>
+            Here's what we{' '}
+            <span style={{ background: 'linear-gradient(135deg,#c4b5fd,#818cf8,#67e8f9)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+              extracted
             </span>
           </h1>
+          <p className="text-sm leading-relaxed max-w-sm" style={{ color: '#6b7280' }}>
+            Review and refine. Every detail shapes the copy and design of your page.
+          </p>
         </motion.div>
 
-        {/* Subtext */}
-        <motion.p
-          variants={itemVariants}
-          className="text-center text-base text-slate-400 max-w-md leading-relaxed"
-        >
-          Review and edit before we match a template. Every detail shapes the final page.
-        </motion.p>
+        {/* Fields grid */}
+        <motion.div variants={fadeUp} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 
-        {/* Grid of field cards */}
-        <motion.div
-          variants={itemVariants}
-          className="w-full grid grid-cols-1 md:grid-cols-2 gap-4"
-        >
-          {/* Business Name */}
-          <div className={cardClass}>
-            <label className={labelClass}>Business Name</label>
-            <input
-              type="text"
-              className={inputClass}
-              value={brief.businessName}
-              onChange={(e) => set('businessName', e.target.value)}
-              placeholder="e.g. MedStaff Pro"
-            />
+          <Field label="Business Name">
+            <StyledInput value={brief.businessName} onChange={v => set('businessName', v)} placeholder="e.g. MedStaff Pro" />
+          </Field>
+
+          <Field label="Industry">
+            <StyledInput value={brief.industry} onChange={v => set('industry', v)} placeholder="e.g. Healthcare Staffing" />
+          </Field>
+
+          <div className="sm:col-span-2">
+            <Field label="Value Proposition">
+              <textarea
+                value={brief.valueProp}
+                onChange={e => set('valueProp', e.target.value)}
+                placeholder="What makes you uniquely valuable?"
+                rows={2}
+                style={{ ...inputStyle, resize: 'none' }}
+                onFocus={e => { e.currentTarget.style.borderColor = 'rgba(124,58,237,0.5)'; e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
+                onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
+              />
+            </Field>
           </div>
 
-          {/* Industry */}
-          <div className={cardClass}>
-            <label className={labelClass}>Industry</label>
-            <input
-              type="text"
-              className={inputClass}
-              value={brief.industry}
-              onChange={(e) => set('industry', e.target.value)}
-              placeholder="e.g. Healthcare Staffing"
-            />
-          </div>
+          <Field label="Target Audience">
+            <StyledInput value={brief.targetAudience} onChange={v => set('targetAudience', v)} placeholder="e.g. Registered nurses" />
+          </Field>
 
-          {/* Value Proposition */}
-          <div className={`${cardClass} md:col-span-2`}>
-            <label className={labelClass}>Value Proposition</label>
-            <textarea
-              rows={2}
-              className={`${inputClass} resize-none`}
-              value={brief.valueProp}
-              onChange={(e) => set('valueProp', e.target.value)}
-              placeholder="What makes you uniquely valuable to your customers?"
-            />
-          </div>
-
-          {/* Target Audience */}
-          <div className={cardClass}>
-            <label className={labelClass}>Target Audience</label>
-            <input
-              type="text"
-              className={inputClass}
-              value={brief.targetAudience}
-              onChange={(e) => set('targetAudience', e.target.value)}
-              placeholder="e.g. Registered nurses seeking travel contracts"
-            />
-          </div>
-
-          {/* Tone & Voice */}
-          <div className={cardClass}>
-            <label className={labelClass}>Tone &amp; Voice</label>
-            <select
-              className={inputClass}
-              value={brief.tone}
-              onChange={(e) => set('tone', e.target.value)}
-              style={{ appearance: 'none', cursor: 'pointer' }}
-            >
-              {TONE_OPTIONS.map((opt) => (
-                <option
-                  key={opt.value}
-                  value={opt.value}
-                  style={{ backgroundColor: '#0e0e14', color: '#fff' }}
+          <Field label="Tone & Voice">
+            <div className="flex flex-wrap gap-2">
+              {TONES.map(t => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => set('tone', t)}
+                  className="rounded-lg px-3 py-1.5 text-xs font-medium capitalize transition-all duration-150"
+                  style={
+                    brief.tone === t
+                      ? { background: 'rgba(124,58,237,0.25)', border: '1px solid rgba(124,58,237,0.5)', color: '#c4b5fd' }
+                      : { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#6b7280' }
+                  }
                 >
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Key Points */}
-          <div className={`${cardClass} md:col-span-2`}>
-            <label className={labelClass}>Key Points</label>
-            <div className="flex flex-col gap-2">
-              {kp.map((point, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <span
-                    className="flex-shrink-0 inline-flex h-5 w-5 items-center justify-center rounded-full text-xs font-semibold"
-                    style={{
-                      background:
-                        'linear-gradient(135deg, rgba(139,92,246,0.3) 0%, rgba(59,130,246,0.3) 100%)',
-                      color: '#a78bfa',
-                      border: '1px solid rgba(139,92,246,0.3)',
-                    }}
-                  >
-                    {i + 1}
-                  </span>
-                  <input
-                    type="text"
-                    className={inputClass}
-                    value={point}
-                    onChange={(e) => setKeyPoint(i, e.target.value)}
-                    placeholder={`Key point ${i + 1}…`}
-                  />
-                </div>
+                  {t}
+                </button>
               ))}
             </div>
+          </Field>
+
+          <div className="sm:col-span-2">
+            <Field label="Key Differentiators">
+              <div className="flex flex-col gap-2">
+                {kp.map((pt, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <span className="shrink-0 text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center" style={{ background: 'rgba(124,58,237,0.2)', color: '#a78bfa', border: '1px solid rgba(124,58,237,0.3)' }}>
+                      {i + 1}
+                    </span>
+                    <StyledInput value={pt} onChange={v => setKp(i, v)} placeholder={`Key point ${i + 1}`} />
+                  </div>
+                ))}
+              </div>
+            </Field>
           </div>
         </motion.div>
 
-        {/* Bottom action row */}
-        <motion.div
-          variants={itemVariants}
-          className="w-full flex items-center justify-between gap-4 pt-2"
-        >
-          {/* Back button */}
+        {/* Actions */}
+        <motion.div variants={fadeUp} className="flex items-center justify-between">
           <button
             type="button"
             onClick={onBack}
-            className="inline-flex items-center gap-1.5 rounded-xl border px-6 py-3 text-sm font-medium text-slate-300 transition-all duration-200"
-            style={{
-              borderColor: 'rgba(255,255,255,0.1)',
-              backgroundColor: 'rgba(255,255,255,0.03)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(139,92,246,0.4)';
-              e.currentTarget.style.color = '#c4b5fd';
-              e.currentTarget.style.backgroundColor = 'rgba(139,92,246,0.06)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-              e.currentTarget.style.color = '#cbd5e1';
-              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.03)';
-            }}
+            className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-medium transition-all duration-150"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#6b7280' }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.16)'; e.currentTarget.style.color = '#d1d5db'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = '#6b7280'; }}
           >
-            <span className="text-slate-400">←</span>
+            <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
             Back
           </button>
-
-          {/* Next CTA */}
           <button
             type="button"
             onClick={onNext}
-            className="inline-flex items-center gap-2.5 rounded-xl px-8 py-3.5 text-sm font-semibold text-white transition-all duration-300"
-            style={{
-              background: 'linear-gradient(135deg, #7c3aed 0%, #4338ca 100%)',
-              boxShadow: '0 0 30px rgba(139,92,246,0.4)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 45px rgba(139,92,246,0.6)';
-              e.currentTarget.style.transform = 'translateY(-1px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 30px rgba(139,92,246,0.4)';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
+            className="inline-flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-semibold text-white transition-all duration-200"
+            style={{ background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', boxShadow: '0 0 24px rgba(124,58,237,0.35), 0 1px 2px rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)' }}
+            onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 0 40px rgba(124,58,237,0.55), 0 1px 2px rgba(0,0,0,0.2)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+            onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 0 24px rgba(124,58,237,0.35), 0 1px 2px rgba(0,0,0,0.2)'; e.currentTarget.style.transform = 'translateY(0)'; }}
           >
             Choose Template
-            <span className="text-violet-200">→</span>
+            <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </button>
         </motion.div>
       </motion.div>
