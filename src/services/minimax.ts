@@ -1,4 +1,4 @@
-const API_URL = '/api/minimax/text/chatcompletion_v2';
+const API_URL = '/api/minimax';
 
 interface MinimaxMessage {
   role: 'system' | 'user' | 'assistant';
@@ -6,13 +6,10 @@ interface MinimaxMessage {
 }
 
 async function chat(messages: MinimaxMessage[]): Promise<string> {
-  const apiKey = import.meta.env.VITE_MINIMAX_API_KEY as string;
-
   const res = await fetch(API_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
       model: 'MiniMax-Text-01',
