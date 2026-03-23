@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00A4A4;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#0f172a;stop-opacity:0.05" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="675" fill="#ffffff" />
+  <rect width="1200" height="675" fill="url(#grad1)" />
+
+  <!-- Navbar -->
+  <rect width="1200" height="72" fill="white" opacity="0.95" />
+  <line x1="0" y1="72" x2="1200" y2="72" stroke="#e8e4dd" stroke-width="1" />
+
+  <!-- Navbar logo placeholder -->
+  <circle cx="70" cy="36" r="20" fill="#00A4A4" opacity="0.3" />
+
+  <!-- Hero section content -->
+  <text x="100" y="180" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#0f172a" letter-spacing="-2">
+    IRS Tax Debt Relief
+  </text>
+  <text x="100" y="240" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#0f172a" letter-spacing="-2">
+    For Your Peace Of Mind
+  </text>
+
+  <!-- Underline accent -->
+  <path d="M 100 250 Q 200 260 300 250" stroke="#8DD5CF" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.7" />
+
+  <!-- Description text -->
+  <text x="100" y="310" font-family="Arial, sans-serif" font-size="16" fill="#475569">
+    Expert tax resolution from licensed CPAs. Free consultation, no upfront fees.
+  </text>
+
+  <!-- CTA Button -->
+  <rect x="100" y="340" width="280" height="50" fill="#00A4A4" rx="25" />
+  <text x="240" y="375" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white" text-anchor="middle">
+    Start Free Consultation
+  </text>
+
+  <!-- Side info boxes -->
+  <g>
+    <!-- Box 1 -->
+    <rect x="100" y="450" width="320" height="180" fill="white" rx="12" stroke="#e8e4dd" stroke-width="1" />
+    <circle cx="130" cy="485" r="20" fill="#00A4A4" opacity="0.15" />
+    <text x="170" y="495" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#0f172a">
+      Licensed CPAs
+    </text>
+    <text x="170" y="515" font-family="Arial, sans-serif" font-size="12" fill="#64748b">
+      Expert tax professionals
+    </text>
+
+    <!-- Box 2 -->
+    <rect x="450" y="450" width="320" height="180" fill="white" rx="12" stroke="#e8e4dd" stroke-width="1" />
+    <circle cx="480" cy="485" r="20" fill="#00A4A4" opacity="0.15" />
+    <text x="520" y="495" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#0f172a">
+      Free Consultation
+    </text>
+    <text x="520" y="515" font-family="Arial, sans-serif" font-size="12" fill="#64748b">
+      No obligation, no fees
+    </text>
+
+    <!-- Box 3 -->
+    <rect x="800" y="450" width="320" height="180" fill="white" rx="12" stroke="#e8e4dd" stroke-width="1" />
+    <circle cx="830" cy="485" r="20" fill="#00A4A4" opacity="0.15" />
+    <text x="870" y="495" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#0f172a">
+      Secure & Confidential
+    </text>
+    <text x="870" y="515" font-family="Arial, sans-serif" font-size="12" fill="#64748b">
+      Your information protected
+    </text>
+  </g>
+
+  <!-- Footer text -->
+  <text x="600" y="650" font-family="Arial, sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">
+    Template-C — Tax Relief Vibrant Landing Page
+  </text>
+</svg>
