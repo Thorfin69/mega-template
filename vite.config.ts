@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         '/api/minimax': {
-          target: 'https://api.minimax.chat',
+          target: 'https://api.minimax.io',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/minimax/, '/v1/text/chatcompletion_v2'),
           configure: (proxy) => {

@@ -36,19 +36,15 @@ async function chat(system: string, prompt: string): Promise<string> {
 }
 
 function extractJson(text: string): unknown {
-  // 1. Fenced code block
   const fenceMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
   if (fenceMatch) {
     try { return JSON.parse(fenceMatch[1].trim()); } catch { /* fall through */ }
   }
-  // 2. Raw trim
   try { return JSON.parse(text.trim()); } catch { /* fall through */ }
-  // 3. First {...} block
   const objMatch = text.match(/(\{[\s\S]*\})/);
   if (objMatch) {
     try { return JSON.parse(objMatch[1]); } catch { /* fall through */ }
   }
-  // 4. First [...] block
   const arrMatch = text.match(/(\[[\s\S]*\])/);
   if (arrMatch) {
     try { return JSON.parse(arrMatch[1]); } catch { /* fall through */ }
@@ -100,12 +96,11 @@ Key Points: ${brief.keyPoints.join(', ')}`;
 Rules:
 - Respect character limits strictly
 - Match the specified tone
-- For image URL slots, output: UNSPLASH:<search query> (e.g. UNSPLASH:travel nurse hospital corridor)
-- For href/link slots, keep the existing placeholder value unchanged (e.g. #contact, #apply)
+- For image URL slots, output: UNSPLASH:<search query>
+- For href/link slots, keep the existing placeholder value unchanged
 - Return ONLY a flat JSON object: { "slot_id": "generated value" }
-- Cover all required slots
 - No markdown, no explanation, only raw JSON`,
-    `Client Brief:\n${briefText}\n\nTemplate Content Slots:\n${templateContentMd}\n\nGenerate values for all slots. Return flat JSON only.`
+    `Client Brief:\n${briefText}\n\nTemplate Content Slots:\n${templateContentMd}\n\nReturn flat JSON only.`
   );
   return extractJson(result) as Record<string, string>;
 }

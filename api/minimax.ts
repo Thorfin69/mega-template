@@ -14,7 +14,7 @@ export default async function handler(req: Request): Promise<Response> {
 
   const body = await req.text();
 
-  const upstream = await fetch('https://api.minimax.chat/v1/text/chatcompletion_v2', {
+  const upstream = await fetch('https://api.minimax.io/v1/text/chatcompletion_v2', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
