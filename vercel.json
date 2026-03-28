@@ -1,0 +1,5 @@
+{
+  "buildCommand": "chmod +x node_modules/.bin/* && tsc && vite build",
+  "outputDirectory": "dist",
+  "framework": "vite"
+}
