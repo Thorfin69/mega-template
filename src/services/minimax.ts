@@ -103,6 +103,9 @@ export async function generateContent(
   brief: RefinedBrief,
   templateContentMd: string
 ): Promise<Record<string, string>> {
+  // Trim content map to avoid hitting model token/timeout limits
+  const trimmedContent = templateContentMd.slice(0, 3000);
+
   const briefText = `Business: ${brief.businessName}
 Industry: ${brief.industry}
 Value Proposition: ${brief.valueProp}
@@ -120,7 +123,7 @@ Rules:
 - For href/link slots, keep the existing placeholder value unchanged
 - Return ONLY a flat JSON object: { "slot_id": "generated value" }
 - No markdown, no explanation, only raw JSON`,
-    `Client Brief:\n${briefText}\n\nTemplate Content Slots:\n${templateContentMd}\n\nReturn flat JSON only.`
+    `Client Brief:\n${briefText}\n\nTemplate Content Slots:\n${trimmedContent}\n\nReturn flat JSON only.`
   );
   return extractJson(result) as Record<string, string>;
 }
