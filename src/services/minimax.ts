@@ -1,7 +1,6 @@
 const API_URL = '/api/minimax';
 
-// Using meta-llama/llama-3.1-8b-instruct:free — free model on OpenRouter
-const MODEL = 'meta-llama/llama-3.1-8b-instruct:free';
+const MODEL = 'minimax/minimax-m2.5:free';
 
 async function chat(system: string, prompt: string): Promise<string> {
   const res = await fetch(API_URL, {
