@@ -1,40 +1,58 @@
 const API_URL = '/api/minimax';
-
 const MODEL = 'minimax/minimax-m2.5:free';
+const MAX_RETRIES = 3;
 
 async function chat(system: string, prompt: string): Promise<string> {
-  const res = await fetch(API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: MODEL,
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: prompt },
-      ],
-      temperature: 0.7,
-      max_tokens: 4096,
-    }),
-  });
+  let lastError = 'Unknown error';
 
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`OpenRouter API error ${res.status}: ${err}`);
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: MODEL,
+          messages: [
+            { role: 'system', content: system },
+            { role: 'user', content: prompt },
+          ],
+          temperature: 0.7,
+          max_tokens: 4096,
+        }),
+      });
+
+      if (!res.ok) {
+        lastError = `API error ${res.status}: ${await res.text()}`;
+        await new Promise(r => setTimeout(r, 1000 * attempt));
+        continue;
+      }
+
+      const data = await res.json() as {
+        choices?: Array<{ message: { content: string } }>;
+        error?: { message: string };
+      };
+
+      if (data.error) {
+        lastError = `OpenRouter: ${data.error.message}`;
+        await new Promise(r => setTimeout(r, 1000 * attempt));
+        continue;
+      }
+
+      if (!data.choices || data.choices.length === 0) {
+        lastError = 'No choices returned';
+        await new Promise(r => setTimeout(r, 1000 * attempt));
+        continue;
+      }
+
+      return data.choices[0].message.content;
+
+    } catch (err) {
+      lastError = err instanceof Error ? err.message : String(err);
+      if (attempt < MAX_RETRIES) await new Promise(r => setTimeout(r, 1000 * attempt));
+    }
   }
 
-  const data = await res.json() as {
-    choices?: Array<{ message: { content: string } }>;
-    error?: { message: string };
-  };
-
-  if (data.error) {
-    throw new Error(`OpenRouter error: ${data.error.message}`);
-  }
-  if (!data.choices || data.choices.length === 0) {
-    throw new Error(`OpenRouter returned no choices. Response: ${JSON.stringify(data)}`);
-  }
-
-  return data.choices[0].message.content;
+  throw new Error(lastError);
 }
 
 function extractJson(text: string): unknown {
