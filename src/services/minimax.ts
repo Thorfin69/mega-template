@@ -1,11 +1,14 @@
 const API_URL = '/api/minimax';
 
+// Using meta-llama/llama-3.1-8b-instruct:free — free model on OpenRouter
+const MODEL = 'meta-llama/llama-3.1-8b-instruct:free';
+
 async function chat(system: string, prompt: string): Promise<string> {
   const res = await fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'MiniMax-Text-01',
+      model: MODEL,
       messages: [
         { role: 'system', content: system },
         { role: 'user', content: prompt },
@@ -17,19 +20,19 @@ async function chat(system: string, prompt: string): Promise<string> {
 
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(`MiniMax API error ${res.status}: ${err}`);
+    throw new Error(`OpenRouter API error ${res.status}: ${err}`);
   }
 
   const data = await res.json() as {
     choices?: Array<{ message: { content: string } }>;
-    base_resp?: { status_code: number; status_msg: string };
+    error?: { message: string };
   };
 
-  if (data.base_resp && data.base_resp.status_code !== 0) {
-    throw new Error(`MiniMax error ${data.base_resp.status_code}: ${data.base_resp.status_msg}`);
+  if (data.error) {
+    throw new Error(`OpenRouter error: ${data.error.message}`);
   }
   if (!data.choices || data.choices.length === 0) {
-    throw new Error(`MiniMax returned no choices. Response: ${JSON.stringify(data)}`);
+    throw new Error(`OpenRouter returned no choices. Response: ${JSON.stringify(data)}`);
   }
 
   return data.choices[0].message.content;
@@ -49,7 +52,7 @@ function extractJson(text: string): unknown {
   if (arrMatch) {
     try { return JSON.parse(arrMatch[1]); } catch { /* fall through */ }
   }
-  throw new Error(`Could not parse MiniMax response as JSON.\n\nRaw:\n${text.slice(0, 500)}`);
+  throw new Error(`Could not parse AI response as JSON.\n\nRaw:\n${text.slice(0, 500)}`);
 }
 
 export interface RefinedBrief {

@@ -5,8 +5,8 @@ export default async function handler(req: Request): Promise<Response> {
     return new Response('Method not allowed', { status: 405 });
   }
 
-  if (!process.env.MINIMAX_API_KEY) {
-    return new Response(JSON.stringify({ error: 'MINIMAX_API_KEY is not configured' }), {
+  if (!process.env.OPENROUTER_API_KEY) {
+    return new Response(JSON.stringify({ error: 'OPENROUTER_API_KEY is not configured' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -14,11 +14,13 @@ export default async function handler(req: Request): Promise<Response> {
 
   const body = await req.text();
 
-  const upstream = await fetch('https://api.minimax.io/v1/text/chatcompletion_v2', {
+  const upstream = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.MINIMAX_API_KEY}`,
+      'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      'HTTP-Referer': 'https://blitzstudio.vercel.app',
+      'X-Title': 'Blitz Studio',
     },
     body,
   });

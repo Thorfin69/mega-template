@@ -16,12 +16,14 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         '/api/minimax': {
-          target: 'https://api.minimax.io',
+          target: 'https://openrouter.ai',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/minimax/, '/v1/text/chatcompletion_v2'),
+          rewrite: (path) => path.replace(/^\/api\/minimax/, '/api/v1/chat/completions'),
           configure: (proxy) => {
             proxy.on('proxyReq', (proxyReq) => {
-              proxyReq.setHeader('Authorization', `Bearer ${env.MINIMAX_API_KEY ?? ''}`);
+              proxyReq.setHeader('Authorization', `Bearer ${env.OPENROUTER_API_KEY ?? ''}`);
+              proxyReq.setHeader('HTTP-Referer', 'http://localhost:5173');
+              proxyReq.setHeader('X-Title', 'Blitz Studio');
             });
           },
         },
