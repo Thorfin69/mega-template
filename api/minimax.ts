@@ -1,18 +1,20 @@
-export const config = { runtime: 'edge' };
+export const config = { maxDuration: 60 };
 
-export default async function handler(req: Request): Promise<Response> {
+// Node.js serverless function — supports up to 60s timeout unlike edge (25s max)
+export default async function handler(
+  req: { method?: string; body?: Record<string, unknown> },
+  res: {
+    status: (code: number) => { json: (d: unknown) => void };
+    json: (d: unknown) => void;
+  }
+) {
   if (req.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 });
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   if (!process.env.OPENROUTER_API_KEY) {
-    return new Response(JSON.stringify({ error: 'OPENROUTER_API_KEY is not configured' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return res.status(500).json({ error: 'OPENROUTER_API_KEY is not configured' });
   }
-
-  const body = await req.text();
 
   const upstream = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
@@ -22,12 +24,9 @@ export default async function handler(req: Request): Promise<Response> {
       'HTTP-Referer': 'https://blitzstudio.vercel.app',
       'X-Title': 'Blitz Studio',
     },
-    body,
+    body: JSON.stringify(req.body),
   });
 
-  const data = await upstream.text();
-  return new Response(data, {
-    status: upstream.status,
-    headers: { 'Content-Type': 'application/json' },
-  });
+  const data = await upstream.json();
+  return res.status(upstream.status).json(data);
 }
