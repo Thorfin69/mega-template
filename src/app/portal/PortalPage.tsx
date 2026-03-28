@@ -4,7 +4,7 @@ import Step1Describe from './steps/Step1Describe';
 import Step2Refine from './steps/Step2Refine';
 import Step3Gallery from './steps/Step3Gallery';
 import Step4Generate from './steps/Step4Generate';
-import { refineDescription, generateContent, type RefinedBrief } from '../../services/minimax';
+import { refineDescription, generateContent, type RefinedBrief, AVAILABLE_MODELS, DEFAULT_MODEL } from '../../services/minimax';
 import { searchPhoto } from '../../services/unsplash';
 import { TEMPLATE_CONTENT_MAP } from './templateContent';
 import type { PortalStep, ContentResult } from './types';
@@ -73,12 +73,13 @@ export default function PortalPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<ContentResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [model, setModel] = useState(DEFAULT_MODEL);
 
   async function handleDescribeComplete(description: string) {
     setIsRefining(true);
     setError(null);
     try {
-      const refined = await refineDescription(description);
+      const refined = await refineDescription(description, model);
       setBrief(refined);
       setStep('refine');
     } catch (err) {
@@ -95,7 +96,7 @@ export default function PortalPage() {
     setError(null);
     try {
       const contentMd = TEMPLATE_CONTENT_MAP[selectedTemplate] ?? '';
-      const slots = await generateContent(brief, contentMd);
+      const slots = await generateContent(brief, contentMd, model);
       const resolved = await Promise.all(
         Object.entries(slots).map(async ([id, val]) => {
           if (val.startsWith('UNSPLASH:')) {
@@ -159,7 +160,29 @@ export default function PortalPage() {
           <StepIndicator current={step} />
         </div>
 
-        <div className="w-24" />
+        {/* Model selector */}
+        <div className="relative">
+          <select
+            value={model}
+            onChange={e => setModel(e.target.value)}
+            className="text-[11px] font-medium rounded-lg pl-2.5 pr-6 py-1.5 appearance-none cursor-pointer transition-all"
+            style={{
+              background: 'rgba(124,58,237,0.1)',
+              border: '1px solid rgba(124,58,237,0.25)',
+              color: '#a78bfa',
+              outline: 'none',
+            }}
+          >
+            {AVAILABLE_MODELS.map(m => (
+              <option key={m.id} value={m.id} style={{ background: '#0d0d1a', color: '#e2e8f0' }}>
+                {m.label} ({m.badge})
+              </option>
+            ))}
+          </select>
+          <svg className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 h-3 w-3" style={{ color: '#a78bfa' }} viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+          </svg>
+        </div>
       </header>
 
       {/* ── Main content ─────────────────────────────────────────────────── */}

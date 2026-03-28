@@ -1,8 +1,16 @@
 const API_URL = '/api/minimax';
-const MODEL = 'minimax/minimax-m2.5:free';
 const MAX_RETRIES = 3;
 
-async function chat(system: string, prompt: string): Promise<string> {
+export const AVAILABLE_MODELS = [
+  { id: 'openai/gpt-4o-mini',          label: 'GPT-4o Mini',     badge: 'Fast'  },
+  { id: 'openai/gpt-5-nano',           label: 'GPT-5 Nano',      badge: 'New'   },
+  { id: 'minimax/minimax-m2.5:free',   label: 'MiniMax M2.5',    badge: 'Free'  },
+  { id: 'meta-llama/llama-3.1-8b-instruct:free', label: 'Llama 3.1 8B', badge: 'Free' },
+];
+
+export const DEFAULT_MODEL = AVAILABLE_MODELS[0].id;
+
+async function chat(system: string, prompt: string, model: string): Promise<string> {
   let lastError = 'Unknown error';
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
@@ -11,7 +19,7 @@ async function chat(system: string, prompt: string): Promise<string> {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: MODEL,
+          model,
           messages: [
             { role: 'system', content: system },
             { role: 'user', content: prompt },
@@ -81,7 +89,7 @@ export interface RefinedBrief {
   keyPoints: string[];
 }
 
-export async function refineDescription(rawDescription: string): Promise<RefinedBrief> {
+export async function refineDescription(rawDescription: string, model: string = DEFAULT_MODEL): Promise<RefinedBrief> {
   const result = await chat(
     'You are a professional web copywriter. Extract structured information from a client description. Return ONLY valid JSON, no markdown, no explanation.',
     `Client description: "${rawDescription}"
@@ -95,13 +103,15 @@ Return this exact JSON structure:
   "tone": "professional|friendly|bold|technical|warm (pick one)",
   "keyPoints": ["key differentiator 1", "key differentiator 2", "key differentiator 3"]
 }`
+    , model
   );
   return extractJson(result) as RefinedBrief;
 }
 
 export async function generateContent(
   brief: RefinedBrief,
-  templateContentMd: string
+  templateContentMd: string,
+  model: string = DEFAULT_MODEL
 ): Promise<Record<string, string>> {
   // Trim content map to avoid hitting model token/timeout limits
   const trimmedContent = templateContentMd.slice(0, 3000);
@@ -124,6 +134,7 @@ Rules:
 - Return ONLY a flat JSON object: { "slot_id": "generated value" }
 - No markdown, no explanation, only raw JSON`,
     `Client Brief:\n${briefText}\n\nTemplate Content Slots:\n${trimmedContent}\n\nReturn flat JSON only.`
+    , model
   );
   return extractJson(result) as Record<string, string>;
 }
