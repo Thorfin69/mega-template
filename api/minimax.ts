@@ -5,6 +5,13 @@ export default async function handler(req: Request): Promise<Response> {
     return new Response('Method not allowed', { status: 405 });
   }
 
+  if (!process.env.MINIMAX_API_KEY) {
+    return new Response(JSON.stringify({ error: 'MINIMAX_API_KEY is not configured' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   const body = await req.text();
 
   const upstream = await fetch('https://api.minimax.chat/v1/text/chatcompletion_v2', {

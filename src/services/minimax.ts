@@ -24,7 +24,17 @@ async function chat(messages: MinimaxMessage[]): Promise<string> {
     throw new Error(`Minimax API error ${res.status}: ${err}`);
   }
 
-  const data = await res.json() as { choices: Array<{ message: { content: string } }> };
+  const data = await res.json() as {
+    choices?: Array<{ message: { content: string } }>;
+    base_resp?: { status_code: number; status_msg: string };
+  };
+
+  if (data.base_resp && data.base_resp.status_code !== 0) {
+    throw new Error(`MiniMax error ${data.base_resp.status_code}: ${data.base_resp.status_msg}`);
+  }
+  if (!data.choices || data.choices.length === 0) {
+    throw new Error(`MiniMax returned no choices. Response: ${JSON.stringify(data)}`);
+  }
   return data.choices[0].message.content;
 }
 
