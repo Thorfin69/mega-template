@@ -280,5 +280,13 @@ export default function Step4Generate({ result, loading, error, onStartOver }: S
     );
   }
 
-  return null;
+  /* ── EMPTY (brief transition state before loading kicks in) ── */
+  return (
+    <div className="flex min-h-[calc(100vh-60px)] items-center justify-center px-4">
+      <motion.div className="flex flex-col items-center gap-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        <div className="h-10 w-10 rounded-full animate-pulse" style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.2)' }} />
+        <p className="text-sm" style={{ color: '#4b5563' }}>Preparing generation…</p>
+      </motion.div>
+    </div>
+  );
 }

@@ -8,7 +8,6 @@ interface Step3Props {
   onSelect: (id: string) => void;
   onBack: () => void;
   onGenerate: () => void;
-  onUseDirectly: (id: string) => void;
 }
 
 function isBestMatch(industries: string[], briefIndustry: string) {
@@ -16,7 +15,7 @@ function isBestMatch(industries: string[], briefIndustry: string) {
   return bi.length > 0 && industries.some(ind => bi.includes(ind.toLowerCase()) || ind.toLowerCase().includes(bi));
 }
 
-export default function Step3Gallery({ selectedId, brief, onSelect, onBack, onGenerate, onUseDirectly }: Step3Props) {
+export default function Step3Gallery({ selectedId, brief, onSelect, onBack, onGenerate }: Step3Props) {
   const [hovered, setHovered] = useState<string | null>(null);
 
   return (
@@ -125,7 +124,7 @@ export default function Step3Gallery({ selectedId, brief, onSelect, onBack, onGe
                   <div className="flex gap-2 mt-auto pt-1">
                     <button
                       type="button"
-                      onClick={() => { onUseDirectly(t.id); window.location.href = t.route; }}
+                      onClick={() => { window.location.href = t.route; }}
                       className="flex-1 rounded-xl py-2 text-xs font-medium transition-all duration-150"
                       style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#6b7280' }}
                       onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; e.currentTarget.style.color = '#d1d5db'; }}

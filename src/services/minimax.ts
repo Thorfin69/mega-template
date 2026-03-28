@@ -29,9 +29,44 @@ async function chat(messages: MinimaxMessage[]): Promise<string> {
 }
 
 function extractJson(text: string): unknown {
-  const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  const raw = match ? match[1].trim() : text.trim();
-  return JSON.parse(raw);
+  // 1. Try to parse a fenced code block first (```json ... ``` or ``` ... ```)
+  const fenceMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (fenceMatch) {
+    try {
+      return JSON.parse(fenceMatch[1].trim());
+    } catch {
+      // fall through to next strategy
+    }
+  }
+
+  // 2. Try the whole response trimmed
+  try {
+    return JSON.parse(text.trim());
+  } catch {
+    // fall through to next strategy
+  }
+
+  // 3. Extract the first {...} or [...] block from the text
+  const objMatch = text.match(/(\{[\s\S]*\})/);
+  if (objMatch) {
+    try {
+      return JSON.parse(objMatch[1]);
+    } catch {
+      // fall through
+    }
+  }
+  const arrMatch = text.match(/(\[[\s\S]*\])/);
+  if (arrMatch) {
+    try {
+      return JSON.parse(arrMatch[1]);
+    } catch {
+      // fall through
+    }
+  }
+
+  throw new Error(
+    `MiniMax returned a response that could not be parsed as JSON.\n\nRaw response:\n${text.slice(0, 500)}`
+  );
 }
 
 export interface RefinedBrief {

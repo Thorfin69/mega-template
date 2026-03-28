@@ -177,7 +177,7 @@ export default function PortalPage() {
           )}
           {step === 'gallery' && (
             <motion.div key="gallery" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}>
-              <Step3Gallery selectedId={selectedTemplate} brief={brief ?? { industry: '', tone: '' }} onSelect={setSelectedTemplate} onBack={() => setStep('refine')} onGenerate={handleGenerate} onUseDirectly={(id) => { window.location.href = `/${id}`; }} />
+              <Step3Gallery selectedId={selectedTemplate} brief={brief ?? { industry: '', tone: '' }} onSelect={setSelectedTemplate} onBack={() => setStep('refine')} onGenerate={handleGenerate} />
             </motion.div>
           )}
           {step === 'generate' && (
