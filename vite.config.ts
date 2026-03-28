@@ -16,13 +16,12 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         '/api/minimax': {
-          target: 'https://api.anthropic.com',
+          target: 'https://api.minimax.chat',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/minimax/, '/v1/messages'),
+          rewrite: (path) => path.replace(/^\/api\/minimax/, '/v1/text/chatcompletion_v2'),
           configure: (proxy) => {
             proxy.on('proxyReq', (proxyReq) => {
-              proxyReq.setHeader('x-api-key', env.ANTHROPIC_API_KEY ?? '');
-              proxyReq.setHeader('anthropic-version', '2023-06-01');
+              proxyReq.setHeader('Authorization', `Bearer ${env.MINIMAX_API_KEY ?? ''}`);
             });
           },
         },

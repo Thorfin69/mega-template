@@ -5,31 +5,34 @@ async function chat(system: string, prompt: string): Promise<string> {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
+      model: 'MiniMax-Text-01',
+      messages: [
+        { role: 'system', content: system },
+        { role: 'user', content: prompt },
+      ],
+      temperature: 0.7,
       max_tokens: 4096,
-      system,
-      messages: [{ role: 'user', content: prompt }],
     }),
   });
 
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(`AI API error ${res.status}: ${err}`);
+    throw new Error(`MiniMax API error ${res.status}: ${err}`);
   }
 
   const data = await res.json() as {
-    content?: Array<{ type: string; text: string }>;
-    error?: { message: string };
+    choices?: Array<{ message: { content: string } }>;
+    base_resp?: { status_code: number; status_msg: string };
   };
 
-  if (data.error) {
-    throw new Error(`AI error: ${data.error.message}`);
+  if (data.base_resp && data.base_resp.status_code !== 0) {
+    throw new Error(`MiniMax error ${data.base_resp.status_code}: ${data.base_resp.status_msg}`);
   }
-  if (!data.content || data.content.length === 0) {
-    throw new Error(`AI returned no content. Response: ${JSON.stringify(data)}`);
+  if (!data.choices || data.choices.length === 0) {
+    throw new Error(`MiniMax returned no choices. Response: ${JSON.stringify(data)}`);
   }
 
-  return data.content[0].text;
+  return data.choices[0].message.content;
 }
 
 function extractJson(text: string): unknown {
@@ -50,7 +53,7 @@ function extractJson(text: string): unknown {
   if (arrMatch) {
     try { return JSON.parse(arrMatch[1]); } catch { /* fall through */ }
   }
-  throw new Error(`Could not parse AI response as JSON.\n\nRaw:\n${text.slice(0, 500)}`);
+  throw new Error(`Could not parse MiniMax response as JSON.\n\nRaw:\n${text.slice(0, 500)}`);
 }
 
 export interface RefinedBrief {

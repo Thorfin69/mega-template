@@ -5,8 +5,8 @@ export default async function handler(req: Request): Promise<Response> {
     return new Response('Method not allowed', { status: 405 });
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return new Response(JSON.stringify({ error: 'ANTHROPIC_API_KEY is not configured on Vercel' }), {
+  if (!process.env.MINIMAX_API_KEY) {
+    return new Response(JSON.stringify({ error: 'MINIMAX_API_KEY is not configured' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -14,12 +14,11 @@ export default async function handler(req: Request): Promise<Response> {
 
   const body = await req.text();
 
-  const upstream = await fetch('https://api.anthropic.com/v1/messages', {
+  const upstream = await fetch('https://api.minimax.chat/v1/text/chatcompletion_v2', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': process.env.ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01',
+      Authorization: `Bearer ${process.env.MINIMAX_API_KEY}`,
     },
     body,
   });
